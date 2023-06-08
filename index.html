@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<head>
+	<title>The Lottery</title>
+	
+	<h1>The Lottery</h1>
+	<hr>
+
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+
+	<style>
+		body{
+		      background-image: url('lottery.jpg');
+		      background-repeat: no-repeat;
+		      background-attachment: fixed;  
+		      background-size: cover;
+		      font-family: Arial, Helvetica, sans-serif;
+    	}
+
+
+		hr{
+			border: 1px solid black;
+			opacity: 0.9;
+		}
+
+		.send button{
+			float: left;
+			margin-top: 7%;
+			margin-left: 5%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.send input{
+			float: left;
+			margin-top: 7%;
+			margin-left: 1%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.bal button{
+			float: left;
+			margin-top: 11%;
+			margin-left: -21.75%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.bal p{
+			float: left;
+			margin-top: 10%;
+			margin-left: -11%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.pickWinner button{
+			float: left;
+			margin-top: 25%;
+			margin-left: 10%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.winner button{
+			float: left;
+			margin-top: 14%;
+			margin-left: -41.5%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.winner p{
+			float: left;
+			margin-top: 14%;
+			margin-left: -31%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.meta {
+			float: right;
+			margin-right: 5%;
+			margin-top: 2%;
+		}
+
+		.meta button{
+			width: 150px;
+			padding: 6px;
+		}
+
+		.addr p{
+			float: right;
+			margin-top: 4.75%;
+			margin-right: -14%;
+			font-size: 13px;
+		}
+
+		.con{
+			float: right;
+			margin-top: 8.25%;
+			margin-right: -16%;
+			font-size: 13px;
+		}
+
+		.list button{
+			float: left;
+			margin-top: 1%;
+			margin-left: -2%;
+			width: 150px;
+			padding: 6px;
+		}
+
+		.para{
+			float: left;
+			margin-top: 3%;
+			margin-left: -17%;
+			padding: 3px;
+
+		}
+
+		h1{
+			color: white;
+			margin-top: 4%;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		button:hover{
+			color: white;
+			background-color: black;
+		}
+
+
+	</style>
+</head>
+<body>
+	<div class="meta">
+		<button onclick="connectMetamask()">Connect MetaMask</button> <br> <br> <br>
+		<button onclick="connectContract()">Connect Contract</button> <br>
+		
+	</div>
+
+	<div class="addr">
+		<p id="metaArea"></p>
+	</div>
+
+	<div class="con">
+		<p id="contractArea"></p>
+	</div>
+	<div class="send">
+		<button onclick="sendEther()">Send Ether</button>
+		<input type="number" id="amount" placeholder="Wei">
+	</div>
+
+	<div class="bal">
+		<button onclick="balance()">Get Balance</button> <br>
+		<p id="balanceArea"></p>
+	</div>
+
+	<div class="pickWinner">
+		<button onclick="pickWinnner()">Pick Winner</button> 
+	</div>
+
+	<div class="winner">
+		<button onclick="winner()">Winner</button> 
+		<p id="winnerArea"></p>
+	</div>
+
+	<div class="list">
+		<button onclick="list()">List of Players</button> <br>
+	</div>
+
+	<div class = "para">
+		<p id="listArea1"></p> 
+		<p id="listArea2"></p> 
+		<p id="listArea3"></p> 
+		<p id="listArea4"></p> 
+		<p id="listArea5"></p> 
+		<p id="listArea6"></p> 
+	</div>
+
+	<script>
+		//Connect MetaMask
+		let account;
+		const connectMetamask = async() => {
+			if(window.ethereum !== "undefined") {
+				const accounts = await ethereum.request({method: "eth_requestAccounts"});
+				account = accounts[0];
+				document.getElementById("metaArea").innerHTML = account;
+			}
+		}
+
+		//Connect COntract
+		const connectContract = async() => {
+			const ABI = [
+				{
+					"inputs": [
+						{
+							"internalType": "uint256",
+							"name": "_ticketPrice",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "_maxPlayers",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "nonpayable",
+					"type": "constructor"
+				},
+				{
+					"inputs": [],
+					"name": "enter",
+					"outputs": [],
+					"stateMutability": "payable",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "getBalance",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "getPlayers",
+					"outputs": [
+						{
+							"internalType": "address[]",
+							"name": "",
+							"type": "address[]"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "jackpot",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "maxPlayers",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "owner",
+					"outputs": [
+						{
+							"internalType": "address payable",
+							"name": "",
+							"type": "address"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "pickWinner",
+					"outputs": [],
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"name": "players",
+					"outputs": [
+						{
+							"internalType": "address",
+							"name": "",
+							"type": "address"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "random",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "ticketPrice",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "winner",
+					"outputs": [
+						{
+							"internalType": "address payable",
+							"name": "",
+							"type": "address"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				}
+			];
+			const Address = "0xC00223eC38e5470b7A7E629056B82B6ab27F02F2";
+			window.web3 = await new Web3(window.ethereum);
+			window.contract = await new window.web3.eth.Contract(ABI, Address);
+			document.getElementById("contractArea").innerHTML = "Contract Connected Successfully";
+		}
+
+		//Get Balance
+		const balance = async () => {
+			const data = await window.contract.methods.getBalance().call();
+			document.getElementById("balanceArea").innerHTML = data;
+		}
+
+		//Sending Ether
+		const sendEther = async() => {
+			const amount = document.getElementById("amount").value;
+			const data = await window.contract.methods.enter().send({from: account, value: amount});
+		}
+
+		//Pick Winner
+		const pickWinnner = async() => {
+			await window.contract.methods.pickWinner().send({from: account});
+		}
+
+		//Display Winner
+		const winner = async() => {
+			data = await window.contract.methods.winner().call();
+			document.getElementById("winnerArea").innerHTML = data;
+		}
+
+		//Get Players
+		const list = async() => {
+			data = await window.contract.methods.getPlayers().call();
+			document.getElementById("listArea1").innerHTML= data[0];
+			document.getElementById("listArea2").innerHTML= data[1];
+			document.getElementById("listArea3").innerHTML= data[2];
+			document.getElementById("listArea4").innerHTML= data[3];
+			document.getElementById("listArea5").innerHTML= data[4];
+			document.getElementById("listArea6").innerHTML= data[5];
+		}
+	</script>
+	
+</body>
